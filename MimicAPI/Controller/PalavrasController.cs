@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,10 +26,17 @@ namespace MimicAPI.Controller
         [Route("")]
         [HttpGet] 
        //opção de obter todas as palavras (vai ser usado no botão de atualizar palavras no aplicativo)
-       public ActionResult ObterTodasPalavras()
-        {
+       public ActionResult ObterTodasPalavras(DateTime? date)
+       {
+           var item = _banco.Palavras.AsQueryable();
+            // Verificando se data tem valor
+            if (date.HasValue)
+            {
+                // verificando se a data do download é maior que a data da nova atualização
+                item = item.Where(a => a.Criado > date.Value || a.Atualizado > date.Value);
+            }
             // return new JsonResult(_banco.Palavras); ou o método abaixo
-            return Ok(_banco.Palavras);
+            return Ok(item);
         }
         
         //exemplo: /api/palavras/1
