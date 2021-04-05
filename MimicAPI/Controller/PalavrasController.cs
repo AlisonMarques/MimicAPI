@@ -1,4 +1,6 @@
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MimicAPI.Database;
 using MimicAPI.Models;
 
@@ -35,25 +37,46 @@ namespace MimicAPI.Controller
         //Pegar apenas uma palavra
         public ActionResult ObterUmaPalavra(int id)
         {
-            return Ok(_banco.Palavras.Find(id));
+            //Verificando se a palavra existe pelo id
+            var obj = _banco.Palavras.Find(id);
+            // se nao existe, retornar um not found 404
+            if (obj == null)
+                return NotFound();
+            
+            return Ok(obj);
         }
         
         [Route("")]
         [HttpPost] 
         //Cadastrar palavra
-        public ActionResult CadastrarPalavra(Palavra palavra)
+        public ActionResult CadastrarPalavra([FromBody]Palavra palavra)
         {
+            // adicionando a palavra ao banco de dados
              _banco.Palavras.Add(palavra);
-             return Ok();
+             
+             //Salvando a palavra no banco de dados
+             _banco.SaveChanges();
+             return Created($"/api/palavras/{palavra.Id}", palavra);
         }
         
         [Route("{id}")]
         [HttpPut]
         //Atualizar palavra
-        public ActionResult AtualizarPalavra(int id, Palavra palavra)
+        public ActionResult AtualizarPalavra(int id, [FromBody]Palavra palavra)
         {
+
+            var obj = _banco.Palavras.AsNoTracking().FirstOrDefault(a => a.Id == id);
+
+            if (obj == null)
+                return NotFound();
+            
             palavra.Id = id;
+
+            //Atualizando a palavra no banco de dados
             _banco.Palavras.Update(palavra);
+            
+            //Salvando a palavra atualizada no banco de dados
+            _banco.SaveChanges();
             return Ok();
         }
         
@@ -62,8 +85,16 @@ namespace MimicAPI.Controller
         // Deletar palavra
         public ActionResult DeletarPalavra(int id)
         {
-            _banco.Palavras.Remove(_banco.Palavras.Find(id));
-            return Ok();
+            var palavra = _banco.Palavras.Find(id);
+
+            if (palavra == null)
+                return NotFound();
+
+            palavra.Ativo = false;
+            _banco.Palavras.Update(palavra);
+            _banco.SaveChanges();
+            /*_banco.Palavras.Remove(_banco.Palavras.Find(id));*/
+            return NoContent();
         }
         
     }
