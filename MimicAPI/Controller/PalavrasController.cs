@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimicAPI.Helpers;
 using MimicAPI.Models;
 using System.Text.Json;
+using AutoMapper;
+using MimicAPI.Models.DTO;
 using MimicAPI.Repositories.Contracts;
 
 namespace MimicAPI.Controller
@@ -16,12 +19,15 @@ namespace MimicAPI.Controller
     [Route("api/palavras")]
     public class PalavrasController : ControllerBase
     {        
-        //Construtor
+        
         private readonly IPalavraRepository _repository;
-        public PalavrasController(IPalavraRepository repository)
+        private readonly IMapper _mapper;
+        //Construtor
+        public PalavrasController(IPalavraRepository repository, IMapper mapper)
         {
             //injeção de dependencia
             _repository = repository;
+            _mapper = mapper;
         }
         //Criando a rota do método ObterTodasPalavras()
         [Route("")]
@@ -55,8 +61,15 @@ namespace MimicAPI.Controller
             // se nao existe, retornar um not found 404
             if (obj == null)
                 return NotFound();
+
+            //Mapeando a Palavra e transformando em PalavraDto
+            PalavraDto palavraDto = _mapper.Map<Palavra, PalavraDto>(obj);
             
-            return Ok(obj);
+            //Adicionando os Links
+            palavraDto.Links = new List<LinkDTO>();
+            palavraDto.Links.Add(new LinkDTO("self", $"https://localhost:5001/api/palavras/{palavraDto.Id}", "GET"));
+            
+            return Ok(palavraDto);
         }
         
         [Route("")]
