@@ -3,8 +3,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimicAPI.Database;
+using MimicAPI.Helpers;
 using MimicAPI.Models;
-
+using System.Text.Json;
 namespace MimicAPI.Controller
 {
     //Controller é um pacote mais usado/focada em criação de sites
@@ -26,15 +27,41 @@ namespace MimicAPI.Controller
         [Route("")]
         [HttpGet] 
        //opção de obter todas as palavras (vai ser usado no botão de atualizar palavras no aplicativo)
-       public ActionResult ObterTodasPalavras(DateTime? date)
+       public ActionResult ObterTodasPalavras([FromQuery]PalavraUrlQuery query)
        {
            var item = _banco.Palavras.AsQueryable();
             // Verificando se data tem valor
-            if (date.HasValue)
+            if (query.Date.HasValue)
             {
                 // verificando se a data do download é maior que a data da nova atualização
-                item = item.Where(a => a.Criado > date.Value || a.Atualizado > date.Value);
+                item = item.Where(a => a.Criado > query.Date.Value || a.Atualizado > query.Date.Value);
             }
+            
+            //Criando também a paginação
+            // skip é pular e take é pegar
+            if (query.PagNumero.HasValue)
+            {
+                var quantidadeTotalRegistros = item.Count();
+                item = item.Skip((query.PagNumero.Value - 1) * query.PagRegistro.Value).Take(query.PagRegistro.Value);
+
+                // Desenvolvendo a lógica da paginação
+                var pagination = new Pagination();
+                pagination.NumeroPagina = query.PagNumero.Value;
+                pagination.RegistroPorPagina = query.PagRegistro.Value;
+                pagination.TotalRegistros = quantidadeTotalRegistros;
+                pagination.TotalPaginas = (int) Math.Ceiling((double) quantidadeTotalRegistros / query.PagRegistro.Value);
+                
+                //Criando X-Pagination no header da api com as informações do objeto pagination
+                Response.Headers.Add("X-Pagination",
+                    JsonSerializer.Serialize(pagination));
+
+                if (query.PagNumero > pagination.TotalPaginas)
+                {
+                    return NotFound();
+                }
+
+            }
+            
             // return new JsonResult(_banco.Palavras); ou o método abaixo
             return Ok(item);
         }
