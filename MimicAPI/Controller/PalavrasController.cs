@@ -105,16 +105,18 @@
 
                 //Mapeando a Palavra e transformando em PalavraDto
                 PalavraDto palavraDto = _mapper.Map<Palavra, PalavraDto>(obj);
-                
-                //Adicionando os Links
-               
+
+                #region Adicionando os Links
                 //Vantagem do Url.Link é deixar o link da api dinâmico e assim vai funcionar bem no deploy
                 palavraDto.Links.Add(new LinkDTO("self", Url.Link("ObterUmaPalavra", new { id = palavraDto.Id}), "GET"));
                 
                 //Mostrando ao usuário que existe outras funcionalidades atráves dos links
                 palavraDto.Links.Add(new LinkDTO("update", Url.Link("AtualizarPalavra", new { id = palavraDto.Id}), "PUT"));
                 palavraDto.Links.Add(new LinkDTO("delete", Url.Link("DeletarPalavra", new { id = palavraDto.Id}), "DELETE"));
-
+                
+                #endregion 
+               
+                
                 return Ok(palavraDto);
             }
             
@@ -123,6 +125,22 @@
             //Cadastrar palavra
             public ActionResult CadastrarPalavra([FromBody]Palavra palavra)
             {
+                #region Validações de cadastro
+                // caso o usuário enviar um formulário vazio
+                if (palavra == null)
+                    return BadRequest();
+                
+                // Validando os dados enviados. Se ficou algum campo sem preencher
+                if (!ModelState.IsValid)
+                {
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
+                
+                #endregion
+                // Colocando a própria API para fornecer a data de cadastro e de Ativo
+                palavra.Ativo = true;
+                palavra.Criado = DateTime.Now;
+                
                 //Cadastrando palavra
                 _repository.CadastrarPalavra(palavra);
 
@@ -139,13 +157,33 @@
             //Atualizar palavra
             public ActionResult AtualizarPalavra(int id, [FromBody]Palavra palavra)
             {
-
+                #region Validações de cadastro
                 var obj = _repository.ObterUmaPalavra(id);
-
+                // validando se a palavra existe no banco de dados
                 if (obj == null)
                     return NotFound();
                 
+                // caso o usuário enviar um formulário vazio
+                if (palavra == null)
+                    return BadRequest();
+                
+                // Validando os dados enviados. Se ficou algum campo sem preencher
+                if (!ModelState.IsValid)
+                {
+                    return new UnprocessableEntityResult();
+                }
+                
+                #endregion
+                
                 palavra.Id = id;
+                
+                //Setando automáticamente esses valores para que o usuário não possa modificar.
+                palavra.Ativo = obj.Ativo;
+                palavra.Criado = obj.Criado;
+                
+                // API colocará a data sozinha // controle interno
+                palavra.Atualizado = DateTime.Now;
+                
                 _repository.AtualizarPalavra(palavra);
 
                 PalavraDto palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
