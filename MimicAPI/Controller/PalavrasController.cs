@@ -50,8 +50,10 @@ namespace MimicAPI.Controller
         }
         
         //exemplo: /api/palavras/1
-        [Route("{id}")]
-        [HttpGet] 
+        /*[Route("{id}")] Removido pois ao adicionar o Url.Link ele passa o id como query e não é isso que queremos
+         para resolver isso vamos passar o parâmetro dentro do HttpGet
+         */
+        [HttpGet("{id}", Name = "ObterUmaPalavra")] 
         //Pegar apenas uma palavra
         public ActionResult ObterUmaPalavra(int id)
         {
@@ -67,8 +69,13 @@ namespace MimicAPI.Controller
             
             //Adicionando os Links
             palavraDto.Links = new List<LinkDTO>();
-            palavraDto.Links.Add(new LinkDTO("self", $"https://localhost:5001/api/palavras/{palavraDto.Id}", "GET"));
+            //Vantagem do Url.Link é deixar o link da api dinâmico e assim vai funcionar bem no deploy
+            palavraDto.Links.Add(new LinkDTO("self", Url.Link("ObterUmaPalavra", new { id = palavraDto.Id}), "GET"));
             
+            //Mostrando ao usuário que existe outras funcionalidades atráves dos links
+            palavraDto.Links.Add(new LinkDTO("update", Url.Link("AtualizarPalavra", new { id = palavraDto.Id}), "PUT"));
+            palavraDto.Links.Add(new LinkDTO("delete", Url.Link("DeletarPalavra", new { id = palavraDto.Id}), "DELETE"));
+
             return Ok(palavraDto);
         }
         
@@ -83,8 +90,8 @@ namespace MimicAPI.Controller
              return Created($"/api/palavras/{palavra.Id}", palavra);
         }
         
-        [Route("{id}")]
-        [HttpPut]
+        /*[Route("{id}")]*/
+        [HttpPut("{id}", Name = "AtualizarPalavra")]
         //Atualizar palavra
         public ActionResult AtualizarPalavra(int id, [FromBody]Palavra palavra)
         {
@@ -101,8 +108,8 @@ namespace MimicAPI.Controller
             return Ok();
         }
         
-        [Route("{id}")]
-        [HttpDelete] 
+        /*[Route("{id}")]*/
+        [HttpDelete("{id}", Name = "DeletarPalavra")] 
         // Deletar palavra
         public ActionResult DeletarPalavra(int id)
         {
