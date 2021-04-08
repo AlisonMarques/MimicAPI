@@ -107,7 +107,7 @@
                 PalavraDto palavraDto = _mapper.Map<Palavra, PalavraDto>(obj);
                 
                 //Adicionando os Links
-                palavraDto.Links = new List<LinkDTO>();
+               
                 //Vantagem do Url.Link é deixar o link da api dinâmico e assim vai funcionar bem no deploy
                 palavraDto.Links.Add(new LinkDTO("self", Url.Link("ObterUmaPalavra", new { id = palavraDto.Id}), "GET"));
                 
@@ -125,8 +125,13 @@
             {
                 //Cadastrando palavra
                 _repository.CadastrarPalavra(palavra);
+
+                PalavraDto palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
+                palavraDto.Links.Add(new LinkDTO("self", 
+                    Url.Link("ObterUmaPalavra", 
+                        new { id = palavraDto.Id}), "GET"));
                 
-                 return Created($"/api/palavras/{palavra.Id}", palavra);
+                 return Created($"/api/palavras/{palavra.Id}", palavraDto);
             }
             
             /*[Route("{id}")]*/
@@ -141,8 +146,13 @@
                     return NotFound();
                 
                 palavra.Id = id;
-                
                 _repository.AtualizarPalavra(palavra);
+
+                PalavraDto palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
+                
+                palavraDto.Links.Add(new LinkDTO("self", 
+                    Url.Link("ObterUmaPalavra", 
+                        new { id = palavraDto.Id}), "GET"));
 
                 return Ok();
             }
