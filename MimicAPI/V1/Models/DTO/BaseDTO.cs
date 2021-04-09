@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MimicAPI.Models.DTO
+namespace MimicAPI.V1.Models.DTO
 {
     public abstract class BaseDTO
     {

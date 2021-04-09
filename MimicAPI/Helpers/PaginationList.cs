@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using MimicAPI.Models.DTO;
+using MimicAPI.V1.Models.DTO;
 
 namespace MimicAPI.Helpers
 {

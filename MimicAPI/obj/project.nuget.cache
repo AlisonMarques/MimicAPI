@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "tPqikYSAPspK+OGRTFf4xR17/Y2+7TN84lmm6+9YctajML90CvtJaVYts7JyNaa66FVLdeGbipbXHT1Q1UNirA==",
+  "dgSpecHash": "b3Yx88rOMzmgzIutD0oDkeQ0xGDaGRpG+j+l9f5iiT4Zzk8MUrqzNkRA8xMsCwJwXy/3P71pnT1ojgDuhLscyQ==",
   "success": true,
   "projectFilePath": "/home/webdev/RiderProjects/MimicAPI/MimicAPI/MimicAPI.csproj",
   "expectedPackageFiles": [
     "/home/webdev/.nuget/packages/automapper/10.1.1/automapper.10.1.1.nupkg.sha512",
     "/home/webdev/.nuget/packages/humanizer.core/2.8.26/humanizer.core.2.8.26.nupkg.sha512",
+    "/home/webdev/.nuget/packages/microsoft.aspnetcore.mvc.versioning/5.0.0/microsoft.aspnetcore.mvc.versioning.5.0.0.nupkg.sha512",
+    "/home/webdev/.nuget/packages/microsoft.aspnetcore.mvc.versioning.apiexplorer/5.0.0/microsoft.aspnetcore.mvc.versioning.apiexplorer.5.0.0.nupkg.sha512",
     "/home/webdev/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
     "/home/webdev/.nuget/packages/microsoft.data.sqlite.core/5.0.4/microsoft.data.sqlite.core.5.0.4.nupkg.sha512",
     "/home/webdev/.nuget/packages/microsoft.dotnet.platformabstractions/3.1.6/microsoft.dotnet.platformabstractions.3.1.6.nupkg.sha512",

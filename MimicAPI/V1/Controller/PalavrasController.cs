@@ -4,19 +4,22 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using MimicAPI.Helpers;
-    using MimicAPI.Models;
+    using MimicAPI.V1.Models;
     using System.Text.Json;
     using AutoMapper;
-    using MimicAPI.Models.DTO;
-    using MimicAPI.Repositories.Contracts;
+    using MimicAPI.V1.Models.DTO;
+    using MimicAPI.V1.Repositories.Contracts;
 
-    namespace MimicAPI.Controller
+    namespace MimicAPI.V1.Controller
     {
         //Controller é um pacote mais usado/focada em criação de sites
         //ControllerBase se usa mais na criação de API (mais indicado)
         
+        // ApiController vai ajudar o versionamento funcionar
+        [ApiController]
         //Criando a rota que vai ser usado para utilizar todos os métodos do controller palavra
-        [Route("api/palavras")]
+        [Route("api/v{version:apiVersion}/palavras")]
+        [ApiVersion("1.0")]
         public class PalavrasController : ControllerBase
         {        
             
@@ -29,9 +32,13 @@
                 _repository = repository;
                 _mapper = mapper;
             }
+            
+            
             //Criando a rota do método ObterTodasPalavras()
             /*[Route("")]*/
             [HttpGet("", Name = "ObterTodasPalavras")] 
+            // Vai especificar qual versão o método suporta
+            [MapToApiVersion("1.0")]
            //opção de obter todas as palavras (vai ser usado no botão de atualizar palavras no aplicativo)
            public ActionResult ObterTodasPalavras([FromQuery]PalavraUrlQuery query)
            {
@@ -93,6 +100,7 @@
              para resolver isso vamos passar o parâmetro dentro do HttpGet
              */
             [HttpGet("{id}", Name = "ObterUmaPalavra")] 
+            [MapToApiVersion("1.0")]
             //Pegar apenas uma palavra
             public ActionResult ObterUmaPalavra(int id)
             {
@@ -122,6 +130,7 @@
             
             [Route("")]
             [HttpPost] 
+            [MapToApiVersion("1.0")]
             //Cadastrar palavra
             public ActionResult CadastrarPalavra([FromBody]Palavra palavra)
             {
@@ -154,6 +163,7 @@
             
             /*[Route("{id}")]*/
             [HttpPut("{id}", Name = "AtualizarPalavra")]
+            [MapToApiVersion("1.0")]
             //Atualizar palavra
             public ActionResult AtualizarPalavra(int id, [FromBody]Palavra palavra)
             {
@@ -187,7 +197,7 @@
                 _repository.AtualizarPalavra(palavra);
 
                 PalavraDto palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
-                
+                // Passando o link para poder ver a palavra atualizada
                 palavraDto.Links.Add(new LinkDTO("self", 
                     Url.Link("ObterUmaPalavra", 
                         new { id = palavraDto.Id}), "GET"));
@@ -197,6 +207,7 @@
             
             /*[Route("{id}")]*/
             [HttpDelete("{id}", Name = "DeletarPalavra")] 
+            [MapToApiVersion("1.0")]
             // Deletar palavra
             public ActionResult DeletarPalavra(int id)
             {

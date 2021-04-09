@@ -10,10 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MimicAPI.Database;
-using MimicAPI.Repositories;
-using MimicAPI.Repositories.Contracts;
-using MimicAPI.Repositories.Contracts.Contracts;
+using MimicAPI.V1.Repositories;
+using MimicAPI.V1.Repositories.Contracts;
+using MimicAPI.V1.Repositories.Contracts.Contracts;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using MimicAPI.Helpers;
 
 namespace MimicAPI
@@ -37,8 +38,20 @@ namespace MimicAPI
             {
                 opt.UseSqlite("Data Source=Database//Mimic.db");
             });
+            
             services.AddMvc(option => option.EnableEndpointRouting = false);
             services.AddScoped<IPalavraRepository, PalavraRepository>();
+            //controle de versionamento
+            services.AddApiVersioning(cfg =>
+            {
+                // essa config gera o headers indicando quais versões a api suporta
+                cfg.ReportApiVersions = true;
+
+                //cfg.ApiVersionReader = new HeaderApiVersionReader("api-version");
+                
+                cfg.AssumeDefaultVersionWhenUnspecified = true;
+                cfg.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1,0);
+            });
 
         }
 
