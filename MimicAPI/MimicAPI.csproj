@@ -6,6 +6,8 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.4" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.4" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.tools" Version="5.0.4">
@@ -13,6 +15,10 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="System.Text.Json" Version="6.0.0-preview.2.21154.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="V1" />
     </ItemGroup>
 
 </Project>

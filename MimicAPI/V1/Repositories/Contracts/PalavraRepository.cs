@@ -3,9 +3,9 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using MimicAPI.Database;
 using MimicAPI.Helpers;
-using MimicAPI.Models;
+using MimicAPI.V1.Models;
 
-namespace MimicAPI.Repositories.Contracts.Contracts
+namespace MimicAPI.V1.Repositories.Contracts.Contracts
 {
     public class PalavraRepository : IPalavraRepository
     {
