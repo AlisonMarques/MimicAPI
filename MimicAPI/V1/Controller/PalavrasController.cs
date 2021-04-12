@@ -20,6 +20,7 @@
         //Criando a rota que vai ser usado para utilizar todos os métodos do controller palavra
         [Route("api/v{version:apiVersion}/palavras")]
         [ApiVersion("1.0")]
+        [ApiVersion("1.1")]
         public class PalavrasController : ControllerBase
         {        
             
@@ -33,14 +34,15 @@
                 _mapper = mapper;
             }
             
-            
-            //Criando a rota do método ObterTodasPalavras()
-            /*[Route("")]*/
+            /// <summary>
+            /// Operação que pega do banco de dados todas as palavras existentes.
+            /// </summary>
+            /// <param name="query">Filtros de pesquisa</param>
+            /// <returns>Listagem de palavras</returns>
             [HttpGet("", Name = "ObterTodasPalavras")] 
-            // Vai especificar qual versão o método suporta
             [MapToApiVersion("1.0")]
-           //opção de obter todas as palavras (vai ser usado no botão de atualizar palavras no aplicativo)
-           public ActionResult ObterTodasPalavras([FromQuery]PalavraUrlQuery query)
+            [MapToApiVersion("1.1")]
+            public ActionResult ObterTodasPalavras([FromQuery]PalavraUrlQuery query)
            {
                var item = _repository.ObterTodasPalavras(query);
                
@@ -52,55 +54,15 @@
                // return new JsonResult(_banco.Palavras); ou o método abaixo
                 return Ok(lista);
             }
-
-           private PaginationList<PalavraDto> CriarLinksListaPalavra(PalavraUrlQuery query, PaginationList<Palavra> item)
-           {
-               // Utilizando o autoMapper para converter em PalavraDto e utilizar os links dinâmicos
-               var lista = _mapper.Map<PaginationList<Palavra>, PaginationList<PalavraDto>>(item);
-
-               // Criando links para cada palavra
-               foreach (var palavra in lista.Results)
-               {
-                   palavra.Links = new List<LinkDTO>();
-                   palavra.Links.Add(new LinkDTO("self", Url.Link("ObterUmaPalavra", new {id = palavra.Id}), "GET"));
-               }
-
-               lista.Links.Add(new LinkDTO("self", Url.Link("ObterTodasPalavras", query), "GET"));
-
-               if (item.Pagination != null)
-               {
-                   //Criando X-Pagination no header da api com as informações do objeto pagination
-                   Response.Headers.Add("X-Pagination",
-                       JsonSerializer.Serialize(item.Pagination));
-
-                   // Verificando se existe uma próxima página ou página anterio
-                   // Lógica da proxima página
-                   if (query.PagNumero + 1 <= item.Pagination.TotalPaginas)
-                   {
-                       var queryString = new PalavraUrlQuery()
-                           {PagNumero = query.PagNumero + 1, PagRegistro = query.PagRegistro};
-
-                       lista.Links.Add(new LinkDTO("next", Url.Link("ObterTodasPalavras", queryString), "GET"));
-                   }
-
-                   // Lógica da página anterior
-                   if (query.PagNumero - 1 > 0)
-                   {
-                       var queryString = new PalavraUrlQuery()
-                           {PagNumero = query.PagNumero - 1, PagRegistro = query.PagRegistro};
-                       lista.Links.Add(new LinkDTO("prev", Url.Link("ObterTodasPalavras", queryString), "GET"));
-                   }
-               }
-
-               return lista;
-           }
-
-           //exemplo: /api/palavras/1
-            /*[Route("{id}")] Removido pois ao adicionar o Url.Link ele passa o id como query e não é isso que queremos
-             para resolver isso vamos passar o parâmetro dentro do HttpGet
-             */
+            
+            /// <summary>
+            /// Operação que pega uma única palavra do banco de dados 
+            /// </summary>
+            /// <param name="id">Código identificado da palavra</param>
+            /// <returns>Um objeto de palavra</returns>
             [HttpGet("{id}", Name = "ObterUmaPalavra")] 
             [MapToApiVersion("1.0")]
+            [MapToApiVersion("1.1")]
             //Pegar apenas uma palavra
             public ActionResult ObterUmaPalavra(int id)
             {
@@ -128,9 +90,15 @@
                 return Ok(palavraDto);
             }
             
+            /// <summary>
+            /// Operação que realiza o cadastro da palavra
+            /// </summary>
+            /// <param name="palavra">Um objeto palavra</param>
+            /// <returns>Um objeto palavra com seus atributos e id</returns>
             [Route("")]
             [HttpPost] 
             [MapToApiVersion("1.0")]
+            [MapToApiVersion("1.1")]
             //Cadastrar palavra
             public ActionResult CadastrarPalavra([FromBody]Palavra palavra)
             {
@@ -161,9 +129,15 @@
                  return Created($"/api/palavras/{palavra.Id}", palavraDto);
             }
             
-            /*[Route("{id}")]*/
+            /// <summary>
+            /// Operação que realiza a substituição de dados de uma palavra específica.
+            /// </summary>
+            /// <param name="id">Código identificado da palavra a ser alterada</param>
+            /// <param name="palavra">Objeto palavra com dados para alteração</param>
+            /// <returns>Retorna apenas a repostas http 200</returns>
             [HttpPut("{id}", Name = "AtualizarPalavra")]
             [MapToApiVersion("1.0")]
+            [MapToApiVersion("1.1")]
             //Atualizar palavra
             public ActionResult AtualizarPalavra(int id, [FromBody]Palavra palavra)
             {
@@ -205,9 +179,14 @@
                 return Ok();
             }
             
-            /*[Route("{id}")]*/
+            /// <summary>
+            /// Operação que desativa uma palavra do sistema.
+            /// </summary>
+            /// <param name="id">Código identificado da palavra</param>
+            /// <returns>Retorna apenas a repostas http 204</returns>
             [HttpDelete("{id}", Name = "DeletarPalavra")] 
             [MapToApiVersion("1.0")]
+            [MapToApiVersion("1.1")]
             // Deletar palavra
             public ActionResult DeletarPalavra(int id)
             {
@@ -223,5 +202,47 @@
                 return NoContent();
             }
             
+            private PaginationList<PalavraDto> CriarLinksListaPalavra(PalavraUrlQuery query, PaginationList<Palavra> item)
+           {
+               // Utilizando o autoMapper para converter em PalavraDto e utilizar os links dinâmicos
+               var lista = _mapper.Map<PaginationList<Palavra>, PaginationList<PalavraDto>>(item);
+
+               // Criando links para cada palavra
+               foreach (var palavra in lista.Results)
+               {
+                   palavra.Links = new List<LinkDTO>();
+                   palavra.Links.Add(new LinkDTO("self", Url.Link("ObterUmaPalavra", new {id = palavra.Id}), "GET"));
+               }
+
+               lista.Links.Add(new LinkDTO("self", Url.Link("ObterTodasPalavras", query), "GET"));
+
+               if (item.Pagination != null)
+               {
+                   //Criando X-Pagination no header da api com as informações do objeto pagination
+                   Response.Headers.Add("X-Pagination",
+                       JsonSerializer.Serialize(item.Pagination));
+
+                   // Verificando se existe uma próxima página ou página anterio
+                   // Lógica da proxima página
+                   if (query.PagNumero + 1 <= item.Pagination.TotalPaginas)
+                   {
+                       var queryString = new PalavraUrlQuery()
+                           {PagNumero = query.PagNumero + 1, PagRegistro = query.PagRegistro};
+
+                       lista.Links.Add(new LinkDTO("next", Url.Link("ObterTodasPalavras", queryString), "GET"));
+                   }
+
+                   // Lógica da página anterior
+                   if (query.PagNumero - 1 > 0)
+                   {
+                       var queryString = new PalavraUrlQuery()
+                           {PagNumero = query.PagNumero - 1, PagRegistro = query.PagRegistro};
+                       lista.Links.Add(new LinkDTO("prev", Url.Link("ObterTodasPalavras", queryString), "GET"));
+                   }
+               }
+
+               return lista;
+           }
+
         }
     }
