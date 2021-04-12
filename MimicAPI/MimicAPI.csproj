@@ -4,6 +4,14 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>MimicAPI.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>MimicAPI.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
@@ -14,11 +22,17 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1" />
       <PackageReference Include="System.Text.Json" Version="6.0.0-preview.2.21154.6" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="V1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Helpers\Swagger\ApiVersionOperationFilter.cs" />
     </ItemGroup>
 
 </Project>
